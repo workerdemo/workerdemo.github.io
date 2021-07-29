@@ -3,57 +3,126 @@ const stopEvent = function (e) {
     e.stopPropagation();
 };
 
-const showTextResultList = (name, data) => {
-    const textResultWrapper = document.getElementById('text-result-wrapper');
-    const listItem = document.createElement('div');
-    listItem.innerHTML = '<div class="row">\n' +
-        '                        <div class="col-3">\n' +
-        '                            <div class="result-title"><i class="bi bi-file-earmark-text"></i>' + name + '</div>\n' +
-        '                        </div>\n' +
-        '                        <div class="col">\n' +
-        '                            <textarea id="text-result">' + data + '</textarea>\n' +
-        '                        </div>\n' +
-        '                    </div>';
-    textResultWrapper.appendChild(listItem);
+const getInitialPassword = () => {
+    return document.getElementById('initial-password').value;
 };
 
-const loadWorker = (files) => {
-    const entries = Object.entries(files);
-    entries.forEach(([key, file]) => {
-        const {name} = file;
-        const ext = name.toLowerCase().substring(name.lastIndexOf('.') + 1);
+const showTexts = (name, data) => {
+    const textResultWrapper = document.getElementById('text-result-wrapper');
+    const createHtml = (fileName, text) => {
+        return '<div class="row">\n' +
+            '    <div class="col-3">\n' +
+            '        <div class="result-title"><i class="bi bi-file-earmark-text"></i>' + fileName + '</div>\n' +
+            '    </div>\n' +
+            '    <div class="col">\n' +
+            '        <textarea id="text-result">' + text + '</textarea>\n' +
+            '     </div>\n' +
+            '</div>'
+    };
 
+    const items = data instanceof Array ? data : [{name, text: data}];
+    items.forEach((value) => {
+        const {name: fileName, text} = value;
+        const listItem = document.createElement('div');
+        listItem.innerHTML = createHtml(fileName, text);
+        textResultWrapper.appendChild(listItem);
+    });
+};
+
+const loadWorker = ({type, url, files}) => {
+    const startTime = new Date().getTime();
+    const promises = [];
+
+    const runner = (uri) => new Promise((resolve, reject) => {
         const worker = new Worker('dist/docToText.js');
         worker.onmessage = (event) => {
-            const {command, data, message} = event.data;
+            const {error, command, fileName, data} = event.data;
 
-            if (command === 'error') {
-                showTextResultList(name, message);
+            if (error) {
+                showTexts(fileName, error);
                 worker.terminate();
+                reject(error);
                 return;
             }
 
             if (command === 'checkPassword') {
-                // const password = prompt('input your password');
-                worker.postMessage({command: 'setPassword', data: '1234'});
+                worker.postMessage({
+                    command: 'setPassword',
+                    password: prompt('input your password')
+                });
             }
 
             if (command === 'result') {
-                showTextResultList(name, data);
-                // worker.terminate();
-                setTimeout(() => {
-                    worker.terminate();
-                }, 1000);
+                showTexts(fileName, data);
+                worker.terminate();
+                resolve();
             }
         };
 
-        worker.postMessage({command: 'file', data: [file, ext]});
+        worker.postMessage({command: 'file', uri, password: getInitialPassword()});
     });
+
+    if (type === 'file') {
+        const entries = Object.entries(files);
+        entries.forEach(([, file]) => {
+            promises.push(runner(file));
+        });
+    } else {
+        promises.push(runner(url));
+    }
+
+    Promise
+        .all(promises)
+        .catch((error) => {
+            console.log('error:', error);
+        })
+        .finally(() => {
+            console.log('load time:', (new Date().getTime() - startTime) / 1000)
+        });
+};
+
+const loadNonWorker = (files) => {
+    const startTime = new Date().getTime();
+    const promises = Object
+        .entries(files)
+        .map(([, file]) => new Promise((resolve, reject) => {
+            const docToText = new DocToText({password: getInitialPassword()});
+            const {name} = file;
+            docToText.parse(file)
+                .then((text) => {
+                    resolve();
+                    showTexts(name, text);
+                })
+                .catch((error) => {
+                    reject();
+                    showTexts(name, error);
+                });
+        }));
+
+    Promise
+        .all(promises)
+        .catch((error) => {
+            console.log('error:', error);
+        })
+        .finally(() => {
+            console.log('load time:', (new Date().getTime() - startTime) / 1000)
+        });
 };
 
 document.addEventListener('DOMContentLoaded', () => {
     const dragDropArea = document.getElementById('drag-drop-area');
     const dragFile = document.getElementById('drag-file');
+    const urlLoadButton = document.getElementById('url-button');
+    const urlInput = document.getElementById('url-input');
+
+    urlLoadButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        const {value} = urlInput;
+
+        if (value !== '') {
+            loadWorker({type: 'url', url: value});
+        }
+    });
 
     dragDropArea.addEventListener('click', (e) => {
         stopEvent(e);
@@ -83,13 +152,15 @@ document.addEventListener('DOMContentLoaded', () => {
         currentTarget.className = '';
 
         stopEvent(e);
-        loadWorker(files);
+        loadWorker({type: 'file', files});
     });
 
     dragFile.addEventListener('change', (e) => {
         const {target} = e;
         const {files} = target;
         stopEvent(e);
-        loadWorker(files);
+
+        loadNonWorker(files);
+        loadWorker({type: 'file', files});
     });
 });
