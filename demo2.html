@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <title>use worker 데모</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css">
+    <link href="/static/style.css" rel="stylesheet">
+</head>
+<body>
+<div class="stop-watch-wrapper">
+    <p><span id="seconds" class="text-time">00</span><span class="text-time">:</span><span id="tens" class="text-time">00</span></p>
+    <button id="button-start">Start</button>
+    <button id="button-stop">Stop</button>
+    <button id="button-reset">Reset</button>
+</div>
+<div class="section">
+    <div style="">
+        <div class="drag-and-drop-wrapper">
+            <div class="row">
+                <div class="col ml-auto">
+                    <p>Drag Files (hwp, doc, docx, xls, xlsx, ppt, pptx, zip, pdf)</p>
+                </div>
+                <div class="col mr-auto" style="text-align: right">
+                    <label>initial password</label>
+                    <input id="initial-password"/>
+                </div>
+            </div>
+            <div class="row">
+                <div style="text-align: right">
+                    <label>url load</label>
+                    <input id="url-input" style="width: 300px">
+                    <button id="url-button">로드</button>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col">
+                    <input id="drag-file" type="file" style="display: none;" multiple>
+                    <div id="drag-drop-area" style="margin:auto; text-align: center;">
+                        <div class="drag-drop-wrap">
+                            <i class="drag-img-icon"></i>
+                            <div style="margin-top: 6px">
+                                upload the files
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <hr>
+            <p>Text Results</p>
+            <div id="text-result-wrapper"></div>
+        </div>
+    </div>
+    <br>
+    <br>
+</div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="static/main-worker.js"></script>
+<script src="static/stopwatch.js"></script>
+</html>

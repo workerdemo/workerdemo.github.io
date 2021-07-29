@@ -1,42 +1,24 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="utf-8">
+    <title>worker 데모</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css">
     <link href="/static/style.css" rel="stylesheet">
 </head>
 <body>
-    <div class="section">
-        <div style="">
-            <div class="drag-and-drop-wrapper">
-                <div class="row">
-                    <div class="col">
-                        <h5>Drag Files (hwp, doc, docx, xls, xlsx, ppt, pptx, pdf)</h5>
-                        <input id="drag-file" type="file" style="display: none;" multiple>
-                        <div id="drag-drop-area" style="margin:auto; text-align: center;">
-                            <div class="drag-drop-wrap">
-                                <i class="drag-img-icon"></i>
-                                <div style="margin-top: 6px">
-                                    Upload the file
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <br>
-                <hr>
-            </div>
-            <div>
-                <h5>Text Results</h5>
-                <div id="text-result-wrapper"></div>
-            </div>
-        </div>
-        <br>
-        <br>
-    </div>
+<div class="section">
+    <ul>
+        <li><a href="/demo1.html" target="_blank"> 데모 1. - Non Worker (워커를 사용하지 않은 버전)</a></li>
+        <li><a href="/demo2.html" target="_blank"> 데모 2. - Worker (워커를 사용한 버전)</a></li>
+    </ul>
+    <br>
+    <p style="text-indent: 24px">
+        <a href="/sample.zip" target="_blank">sample files download (포멧별 테스트 샘플 파일)</a>
+    </p>
+</div>
 </body>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="static/main.js"></script>
 </html>
