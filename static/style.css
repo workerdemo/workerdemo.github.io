@@ -1,4 +1,4 @@
-*{font-family:"Apple SD Ghotic", Helvetica, Arial, "Lucida Grande", sans-serif;font-size:13px;}
+*{font-family:"Apple SD Ghotic", Helvetica, Arial, "Lucida Grande", sans-serif;font-size:12px;}
 html, body{width:100%;}
 body, pre{margin:0;}
 hr{max-width: 950px; border: 1px solid #484646;}
@@ -25,7 +25,7 @@ button{border: 1px solid #000;font-size: 12px}
 .center-wrapper .center-download-wrapper .center-download-container{border:2px solid #fff;border-radius:26px;text-align:center;line-height:1.2 }
 .center-wrapper .center-download-wrapper .center-download-container .center-download-box{cursor:pointer;padding:14px 40px;font-size:18px;font-weight:bold;display:flex;}
 .center-wrapper .center-download-wrapper .center-download-container .center-download-box .center-download-image-icon{margin-top:4px;margin-right:4px;width:16px;height:15px;vertical-align:middle;display:inline-block;background-image:url('/static/download_icon.png');background-size:100% 100%;}
-.result-title{padding-left: 10px; width: 100%;}
+.result-title{padding-left: 10px; width: 100%;text-overflow: ellipsis;overflow: hidden;word-break: break-all;}
 .stop-watch-wrapper {text-align: center; margin-top: 10px;}
 #text-result{width:100%;height: 80px;border:0;padding:0;background:#f0f0f0 }
 #initial-password{height: 20px;}
