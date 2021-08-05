@@ -51,9 +51,12 @@ const loadNonWorker = (files) => {
     Promise
         .all(promises)
         .then((data) => {
-            data.forEach(([fileName, text]) => {
-                showTexts(fileName, text);
-            });
+            const loadTime = (new Date().getTime() - startTime) / 1000;
+            if (confirm('실행시간은 ' + loadTime + ' 입니다. 결과를 보시겠습니까?')) {
+                data.forEach(([fileName, text]) => {
+                    showTexts(fileName, text);
+                });
+            }
         })
         .catch((error) => {
             console.log('error:', error);
