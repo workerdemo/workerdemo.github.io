@@ -1,3 +1,7 @@
+const urlSearchParams = new URLSearchParams(window.location.search);
+const params = Object.fromEntries(urlSearchParams.entries());
+const workerPoolSize = params.size ? params.size * 1 : null;
+
 window.workerPool = null;
 const createWorkerPool = () => {
     const xhr = new XMLHttpRequest();
@@ -5,7 +9,7 @@ const createWorkerPool = () => {
     xhr.responseType = 'blob';
     xhr.onload = function() {
         if (xhr.status == 200) {
-            window.workerPool = WorkerPool(URL.createObjectURL(this.response), {size: 4});
+            window.workerPool = WorkerPool(URL.createObjectURL(this.response), {size: workerPoolSize});
         }
     };
     xhr.send();
