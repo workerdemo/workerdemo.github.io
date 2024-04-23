@@ -15,7 +15,7 @@ const showTexts = (name, data) => {
                     '<div class="result-title"><i class="bi bi-file-earmark-text"></i>' + fileName + '</div>' +
                  '</div>' +
                  '<div class="col">' +
-                    '<textarea id="text-result">' + text + '</textarea>' +
+                    '<textarea id="text-result" style="height: 256px">' + text + '</textarea>' +
                  '</div>' +
                '</div>';
     };
