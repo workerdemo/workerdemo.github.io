@@ -5,7 +5,7 @@ hr{max-width: 950px; border: 1px solid #484646;}
 input{border-radius: 0; border: 1px solid #000;}
 button{border: 1px solid #000;font-size: 12px}
 .text-time{font-size: 24px;}
-.drag-and-drop-wrapper{height: 312px; display: block}
+.drag-and-drop-wrapper{height: 360px; display: block}
 #drag-drop-area{background:#f0f0f0;height:232px;}
 #drag-drop-area .drag-img-icon{width:16px;height:16px;vertical-align:middle;display:inline-block;background-image:url('/static/upload_icon.png');background-size:100% 100%;}
 #drag-drop-area .drag-drop-wrap{display:inline-block;font-size:14px;color:#444;padding-top:100px;}
