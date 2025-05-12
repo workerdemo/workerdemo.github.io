@@ -24,6 +24,7 @@ const showTexts = (name, data) => {
     let textHtml = '';
     items.forEach((value) => {
         const {name: fileName, text} = value;
+        const textLength = text.length;
         textHtml += createHtml(fileName, textLength > 100 ? text.slice(0, 100) + '\n텍스트 길이:' + textLength : text);
     });
 
