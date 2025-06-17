@@ -1,0 +1,871 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <title>카카오톡 화면</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', Roboto, sans-serif;
+            font-weight: 300;
+            background-color: #f5f5f5;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+        }
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .chat-header {
+            background-color: #fff;
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        .chat-header h1 {
+            margin: 0;
+            font-size: 18px;
+            color: #1e1e1e;
+            font-weight: 400;
+            letter-spacing: -0.5px;
+        }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            font-family: 'Apple SD Gothic Neo', sans-serif;
+        }
+        .message {
+            max-width: 70%;
+            min-width: 40px;
+            width: fit-content;
+            margin: 12px 0;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+        .message.file-header {
+            background: #eee;
+            padding: 6px 12px;
+            border-radius: 12px;
+        }
+        .message.sent {
+            background-color: #ffd700;
+            color: #000;
+            margin-left: auto;
+            max-height: 180px; /* 1.4 * 14px * 4 = 80px */
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+        }
+        .message.sent::before:not(.file-message) {
+            content: '';
+            position: absolute;
+            right: 10px;
+            width: 0;
+            height: 0;
+            border-top: 9px solid transparent;
+            border-left: 12px solid #ffd700;
+            border-bottom: 12px solid transparent;
+        }
+        .message.received {
+            background-color: #fff;
+            color: #1e1e1e;
+            border: 1px solid transparent;
+            position: relative;
+        }
+        .message.received::before {
+            content: '';
+            position: absolute;
+            left: -9px;
+            width: 0;
+            height: 0;
+            border-top: 12px solid transparent;
+            border-right: 12px solid #fff;
+            border-bottom: 12px solid transparent;
+            z-index: -1;
+        }
+        .chat-input {
+            background-color: #fff;
+            padding: 12px;
+            border-top: 1px solid #ddd;
+            height: 160px;
+            position: relative;
+        }
+        .chat-input textarea {
+            width: 100%;
+            border: none;
+            padding: 12px;
+            margin: 0;
+            font-size: 16px;
+            font-weight: 300;
+            font-family: 'Apple SD Gothic Neo', sans-serif;
+            resize: none;
+            height: 80px;
+            box-sizing: border-box;
+        }
+        .button-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            background-color: #fff;
+        }
+        .attachment-icon {
+            width: 24px;
+            height: 24px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%239E9E9E" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>') no-repeat center center;
+            cursor: pointer;
+        }
+        .chat-input button {
+            background-color: #ffd700;
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 22px;
+            cursor: pointer;
+            font-weight: 300;
+            transition: all 0.2s ease;
+        }
+        .chat-input button:hover {
+            background-color: #ffed4a;
+            transform: translateY(-2px);
+        }
+        .chat-input button:active {
+            transform: translateY(0);
+        }
+        .attachment-icon {
+            width: 24px;
+            height: 24px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%239E9E9E" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>') no-repeat center center;
+            cursor: pointer;
+        }
+        .chat-messages.drag-on {
+            position: relative;
+        }
+        .chat-messages.drag-on::after {
+            content: '';
+            position: absolute;
+            top: 48%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 30px;
+            height: 30px;
+            background-color: #ffd700;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            pointer-events: none;
+        }
+        .chat-messages.drag-on::after {
+            content: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23000" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>');
+            width: 20px;
+            height: 20px;
+            animation: pulse 1s infinite;
+        }
+        .chat-messages .stream-text span {
+            font-size: 0.75rem;
+            font-weight: 500;
+            line-height: 1;
+            text-align: center;
+            color: #000;
+            border-radius: 9999px;
+            display: inline-block;
+            animation: pulse-stream 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse-stream {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+        .chat-messages .stream-text::after, .chat-messages .summarize-stream-text::after {
+            content: '';
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            background: url('static/text-loading.gif') no-repeat center center;
+            width: 30px;
+            height: 30px;
+            background-size: contain;
+        }
+        .chat-messages .stream-text.audio-streaming::after {
+            background: url('static/sound-wave.gif') no-repeat center center;
+            width: 30px;
+            height: 30px;
+            background-size: contain;
+        }
+        .chat-messages.drag-on::before {
+            content: '파일을 여기에 놓으세요';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, 50%);
+            color: #666;
+            font-size: 14px;
+            font-weight: 300;
+            font-family: 'Apple SD Gothic Neo', sans-serif;
+            pointer-events: none;
+        }
+        .chat-messages .file-list {
+            background: white;
+            border-radius: 2px;
+            font-size: 12px;
+            transform-origin: center;
+            animation: scaleIn 0.3s ease-out forwards;
+            min-width: 70%;
+            max-height: 178px;
+        }
+        .chat-messages .file-list .file-list-header {
+            padding: 4px 0px;
+            color: #1e1e1e;
+            font-weight: 400;
+        }
+        .chat-messages .file-list .file-list-items {
+            overflow: scroll;
+            max-height: 110px;
+        }
+        .chat-messages .file-list .file-list-item {
+            list-style: none;
+            padding: 4px 0px;
+            margin: 4px 0px;
+            color: #1e1e1e;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Apple SD Gothic Neo', Roboto, sans-serif;
+            transition: background-color 0.2s ease;
+            cursor: pointer;
+        }
+        .chat-messages .file-list .file-list-item:hover,
+        .chat-messages .file-list .file-list-item:active {
+            background-color: #f5f5f5;
+        }
+        .chat-messages .file-message {
+            background: white;
+            border-radius: 2px;
+            font-size: 12px;
+            transform-origin: center;
+            animation: scaleIn 0.3s ease-out forwards;
+            height: 180px;
+            width: 70%;
+        }
+        .chat-messages .file-message .file-name {
+            display: block;
+            width: calc(100% - 46px);
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .chat-messages .file-message .file-message-content .file-description {
+            transition: all 0.3s ease-in-out;
+            height: 42px;
+        }
+
+        .chat-messages .file-message .file-message-content:not(.initial).expanded .file-description {
+            overflow: hidden;
+            height: 0px;
+            opacity: 0;
+            padding: 0;
+        }
+
+        .chat-messages .file-message .file-header {
+            padding: 4px 0px;
+            color: #1e1e1e;
+            font-weight: 400;
+        }
+        .chat-messages .file-message::before {
+            display: none;
+        }
+        .chat-messages .file-message .file-description {
+            padding: 4px 0px;
+        }
+        .chat-messages .file-message .file-text {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            background: rgb(238, 238, 238);
+            border-radius: 5px;
+            padding: 5px;
+            transition: all 0.3s ease;
+            position: absolute;
+            width: 100%;
+            top: 75px;
+            height: 90px;
+            -webkit-line-clamp: 5;
+        }
+        .chat-messages .file-message .file-message-content.expanded .file-text {
+            animation: slideDown 0.3s ease;
+            top: 28px;
+            height: 138px;
+            -webkit-line-clamp: unset;
+            overflow: scroll;
+            white-space: break-spaces;
+        }
+        .chat-messages .file-message .file-audio, .chat-messages .file-message .file-summarize-text {
+            display: none;
+            flex-direction: column;
+            background: rgb(238, 238, 238);
+            border-radius: 5px;
+            padding: 5px;
+            transition: all 0.3s ease;
+            position: absolute;
+            width: 100%;
+            top: 75px;
+            height: 90px;
+            align-items: center;
+            justify-content: center;
+            gap:4px;
+        }
+
+        .chat-messages .file-message .seekbar {
+            width: 80%;
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .chat-messages .file-message .seekbar input[type="range"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 2px;
+            border-radius: 2px;
+            background: #e0e0e0;
+            background-image: linear-gradient(#4a90e2, #4a90e2);
+            background-size: 0% 100%;
+            background-repeat: no-repeat;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        
+        .chat-messages .file-message .seekbar input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4a90e2;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s ease;
+        }
+        
+        .chat-messages .file-message .seekbar input[type="range"]:hover {
+            height: 6px;
+        }
+        
+        /* Firefox 스타일 */
+        .chat-messages .file-message .seekbar input[type="range"]::-moz-range-thumb {
+            width: 8px;
+            height: 8px;
+            border: none;
+            border-radius: 50%;
+            background: #4a90e2;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s ease;
+        }
+        
+        .chat-messages .file-message .seekbar input[type="range"]:active::-moz-range-thumb {
+            transform: scale(1.2);
+            background: #357abd;
+        }
+        
+        .chat-messages .file-message .seekbar input[type="range"]:active::-webkit-slider-thumb {
+            transform: scale(1.2);
+            background: #357abd;
+        }
+
+        .chat-messages .file-message audio {
+            width: 100%;
+            z-index: 9;
+        }
+
+        .chat-messages .file-message .audio-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .chat-messages .file-message .audio-controls #podcast-play-pause {
+            border: none;
+            background: none;
+            padding: 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+        }
+
+        /* 기본적으로 일시정지 아이콘은 숨김 */
+        #podcast-play-pause .pause-icon {
+            display: none;
+        }
+
+        /* 재생 중일 때 재생 아이콘 숨기고 정지 아이콘 표시 */
+        #podcast-play-pause.playing .play-icon {
+            display: none;
+        }
+
+        #podcast-play-pause.playing .stop-icon {
+            display: block;
+            background: url('static/sound-wave.gif') no-repeat center center;
+            width: 35px;
+            height: 35px;
+            background-size: 35px;
+        }
+
+        /* 일시정지 상태일 때 재생 아이콘 표시 */
+        #podcast-play-pause.paused .play-icon {
+            display: block;
+        }
+
+        #podcast-play-pause.paused .stop-icon {
+            display: none;
+        }
+
+        /* 모달 스타일 */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+        font-size: 12px;
+        font-family: 'Apple SD Gothic Neo';
+    }
+
+    .modal-content {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        width: 85%;
+        max-width: 400px;
+        max-height: 80vh;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .modal-header {
+        margin-bottom: 10px;
+        text-align: left;
+    }
+    
+    .modal-title {
+        font-weight: 400;
+        font-size: 16px;
+        margin-bottom: 5px;
+    }
+    
+    .file-name {
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 10px;
+        word-break: break-all;
+    }
+
+    .modal-message {
+        flex: 1;
+        margin-bottom: 10px;
+        font-size: 13px;
+        color: #333;
+        text-align: left;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .text-preview {
+        flex: 1;
+        border: 1px solid #eee;
+        border-radius: 6px;
+        padding: 10px;
+        background-color: #f9f9f9;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .file-content {
+        flex: 1;
+        overflow-y: auto;
+        max-height: 40vh;
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-size: 12px;
+        line-height: 1.4;
+        color: #333;
+        padding-right: 5px;
+    }
+    
+    /* 스크롤바 스타일 */
+    .file-content::-webkit-scrollbar {
+        width: 4px;
+    }
+    
+    .file-content::-webkit-scrollbar-thumb {
+        background-color: #ddd;
+        border-radius: 4px;
+    }
+    
+    .file-content::-webkit-scrollbar-track {
+        background-color: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    .modal-actions {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .modal-btn {
+        padding: 8px 20px;
+        border: none;
+        border-radius: 6px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .modal-btn.confirm {
+        background-color: #ffd700;
+        color: #000;
+    }
+
+    .modal-btn.cancel {
+        background-color: #f1f1f1;
+        color: #333;
+    }
+
+    .dont-show-again {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        color: #666;
+        margin-top: 5px;
+    }
+    
+    /* 커스텀 체크박스 컨테이너 */
+    .custom-checkbox {
+        display: flex;
+        align-items: center;
+        position: relative;
+        padding-left: 18px;
+        cursor: pointer;
+        user-select: none;
+    }
+    
+    /* 기본 체크박스 숨기기 */
+    .custom-checkbox input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+        height: 0;
+        width: 0;
+    }
+    
+    /* 체크박스 스타일 */
+    .checkmark {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 16px;
+        width: 16px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        transition: all 0.2s;
+    }
+    
+    /* 호버 시 스타일 */
+    .custom-checkbox:hover input ~ .checkmark {
+        border-color: #ffd700;
+    }
+    
+    /* 체크박스 체크 시 스타일 */
+    .custom-checkbox input:checked ~ .checkmark {
+        background-color: #ffd700;
+        border-color: #ffd700;
+    }
+    
+    /* 체크마크 (체크 시 보임) */
+    .checkmark:after {
+        content: "";
+        position: absolute;
+        display: none;
+        left: 4px;
+        top: 1px;
+        width: 4px;
+        height: 8px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
+    
+    /* 체크박스 체크 시 체크마크 표시 */
+    .custom-checkbox input:checked ~ .checkmark:after {
+        display: block;
+    }
+    
+    /* 라벨 텍스트 스타일 */
+    .label-text {
+        margin-left: 5px;
+        font-size: 12px;
+        color: #666;
+    }
+
+    .audio-time {
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        width: 85px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo';
+            font-size: 12px;
+            padding: 0 
+        }
+
+        .audio-time span {
+            width: 40px;
+            text-align: center;
+        }
+
+        .chat-messages .file-message .file-audio .stream-text {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            border-radius: 5px;
+            z-index: 10;
+            background: rgb(238, 238, 238);
+        }
+
+        .chat-messages .file-message .preview {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .chat-messages .file-message .file-icon {
+            position: absolute;
+            right: 0px;
+            top: 0px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-messages .file-message .file-summarize {
+            position: absolute;
+            right: 24px;
+            top: 35px;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 25px;
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+
+        .chat-messages .file-message .file-summarize:active {
+            cursor: pointer;
+            outline: transparent;
+        }
+
+        .chat-messages .file-message .podcast-icon {
+            position: absolute;
+            right: -3px;
+            top: 35px;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 25px;
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+
+        .chat-messages .file-message .podcast-icon:active {
+            cursor: pointer;
+            outline: transparent;
+        }
+
+        @keyframes slideDown {
+            from {
+                top: 75px;
+                height: 90px;
+                max-height: 90px;
+                -webkit-line-clamp: 4;
+            }
+            to {
+                top: 28px;
+                height: 138px;
+                max-height: 138px;
+                line-clamp: unset;
+                overflow: scroll;
+                white-space: break-spaces;
+            }
+        }
+        
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0.7;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0px rgba(0, 0, 0, 0.2);
+            }
+            100% {
+                box-shadow: 0 0 0 5px rgba(0, 0, 0, 0);
+            }
+        }
+
+        .podcast-icon.active, .file-summarize.active {
+            background-color: #FFD700;
+            border-color: #FFD700;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>데모방</h1>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <div class="message received">
+                <span class="message-text">파일 전달 부탁드립니다</span>
+            </div>
+        </div>
+        <div class="chat-input">
+            <textarea id="message-input" placeholder="메시지를 입력하세요" style="font-weight: 300;"></textarea>
+            <div class="button-container">
+                <div style="display: flex; align-items: center;">
+                    <div class="attachment-icon" onclick="openFilePicker()">    
+                </div>
+                <input type="file" id="file-input" style="display: none;" multiple></div>
+                <button onclick="sendMessage()">전송</button>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    function sendMessage() {
+        const input = document.getElementById('message-input');
+        const message = input.value.trim();
+        if (message) {
+            addMessage(message, true);
+            input.value = '';
+        }
+    }
+
+    function addMessage(text, isSent) {
+        const messagesContainer = document.getElementById('chat-messages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+        messageDiv.textContent = text;
+        messagesContainer.appendChild(messageDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function openFilePicker() {
+        document.getElementById('file-input').click();
+    }
+
+    document.addEventListener('keypress', function(e) {
+        if (!e.shiftKey && e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+</script>
+<script src="dist/docParser.cjs"></script>
+    <!-- 요약 확인 모달 -->
+    <div id="summaryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">파일 요약</div>
+                <div id="fileName" class="file-name" style="display: inline-block;"></div>&nbsp;<span style="font-weight: 400;">문서의 요약</span>을<br>진행하시겠습니까?
+            </div>
+            <div class="modal-message">
+                <div class="text-preview">
+                    <div id="fileContent" class="file-content"></div>
+                </div>
+            </div>
+            <div style="text-align: center;">
+                이 문서의 내용을 요약하려면,<br>본 텍스트가 자동으로 <b>분석</b> 처리됩니다.<br>
+                해당 내용에는 <b>개인정보</b>가 포함될 수 있으며,<br><b>분석</b>은 내부 시스템에서 안전하게 수행됩니다.
+            </div>
+            <div style="text-align: center;padding: 10px 0">
+                <span style="font-weight: 400;">이 내용을 이해하고 동의합니다.</span>
+            </div>
+            <div class="dont-show-again">
+                <label class="custom-checkbox">
+                    <input type="checkbox" id="dontShowAgain">
+                    <span class="checkmark"></span>
+                    <span class="label-text">다시 보지 않기</span>
+                </label>
+            </div>
+            <div class="modal-actions">
+                <button id="confirmSummary" class="modal-btn confirm">확인</button>
+                <button id="cancelSummary" class="modal-btn cancel">취소</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="static/stream.js"></script>
+    <script src="static/main-chat.js"></script>
+    <script src="static/summarize.js"></script>
+</body>
+</html>
