@@ -1,5 +1,3 @@
-const token = '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';
-
 function summarizeText(fileMessageNode, fileName, message) {
     (async () => {
         const fileSummaryText = fileMessageNode.querySelector(".file-summarize-text");
@@ -9,7 +7,7 @@ function summarizeText(fileMessageNode, fileName, message) {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
+                Authorization: `Bearer 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`,
             },
             body: JSON.stringify({
                 model: "gpt-4o-mini",
