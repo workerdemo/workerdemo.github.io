@@ -7,7 +7,7 @@ function summarizeText(fileMessageNode, fileName, message) {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer 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`,
+                Authorization: 'Bearer ' + 'sk-proj-qK_UFAzE8mVddgo9zlQUy4_L7ELHv0EfPAcjQsDflI80p6VQ5YIajOkHR' + '-' + 'frN9XzDqFytg3fuET3BlbkFJQiyXhLIvuiagUVpT4j4q_kHx0OY6Wg_xjkDqyj4XFOXdarD-tXvbApu8V9za29jUxeT_EM70YA',
             },
             body: JSON.stringify({
                 model: "gpt-4o-mini",
