@@ -1,3 +1,5 @@
+const token = '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';
+
 function summarizeText(fileMessageNode, fileName, message) {
     (async () => {
         const fileSummaryText = fileMessageNode.querySelector(".file-summarize-text");
