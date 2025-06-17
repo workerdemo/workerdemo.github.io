@@ -3,11 +3,11 @@ function summarizeText(fileMessageNode, fileName, message) {
         const fileSummaryText = fileMessageNode.querySelector(".file-summarize-text");
         fileSummaryText.style.display = "flex";
 
-        const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        const response = await fetch("https://motiveko.mooo.com/v1/chat/completions", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: 'Bearer ' + 'sk-proj-qK_UFAzE8mVddgo9zlQUy4_L7ELHv0EfPAcjQsDflI80p6VQ5YIajOkHR' + '-' + 'frN9XzDqFytg3fuET3BlbkFJQiyXhLIvuiagUVpT4j4q_kHx0OY6Wg_xjkDqyj4XFOXdarD-tXvbApu8V9za29jUxeT_EM70YA',
+                Authorization: `Bearer sk-kLTf_EJKcp5CEcua7iundw`,
             },
             body: JSON.stringify({
                 model: "gpt-4o-mini",

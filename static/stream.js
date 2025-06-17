@@ -15,11 +15,11 @@ function processStreamChunk(text) {
 }
 
 async function fetchTTS(text) {
-  const res = await fetch('https://api.openai.com/v1/audio/speech', {
+  const res = await fetch('https://motiveko.mooo.com/v1/audio/speech', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + 'sk-proj-qK_UFAzE8mVddgo9zlQUy4_L7ELHv0EfPAcjQsDflI80p6VQ5YIajOkHR' + '-' + 'frN9XzDqFytg3fuET3BlbkFJQiyXhLIvuiagUVpT4j4q_kHx0OY6Wg_xjkDqyj4XFOXdarD-tXvbApu8V9za29jUxeT_EM70YA'
+      'Authorization': `Bearer sk-kLTf_EJKcp5CEcua7iundw`
     },
     body: JSON.stringify({
       model: 'tts-1', // 또는 'tts-1-hd'
@@ -74,11 +74,11 @@ async function streamChat(continer, fileName, message) {
   let streamResponseData = summaryData;
   
   if (!summaryData) {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    const response = await fetch("https://motiveko.mooo.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer sk-kLTf_EJKcp5CEcua7iundw`,
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
