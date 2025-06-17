@@ -1,4 +1,4 @@
-const token = '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';
+const token = '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';
 
 function summarizeText(fileMessageNode, fileName, message) {
     (async () => {
